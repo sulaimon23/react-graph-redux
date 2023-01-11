@@ -27,7 +27,7 @@ export function HomePage() {
         const items = await ItemsService.getItems(1, 10).catch((err) => {
             console.log("Error: ", err);
         });
-
+        //
         console.log("Anime page: ", items);
         if (items) setItems(items);
     };
