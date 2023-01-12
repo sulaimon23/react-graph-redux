@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Dispatch } from "redux";
 import styled from "styled-components";
-import { useAppDispatch } from "../../hooks";
+import { useAppDispatch, useAppSelector } from "../../hooks";
 import ItemsService from "../../services/itemsService";
 import { setItemData } from "../../services/dataSlice";
 import Items from "../../components/Items";
@@ -13,86 +13,112 @@ import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 import DashboardModal from "../../components/DashboardModal";
 import EditItem from "../../components/EditItem";
 import VerifyEmail from "../../components/VerifyEmail";
+import { createSelector } from "reselect";
+import { fetchState } from "../../services/selectors";
+import { toast } from "react-toastify";
+import { Item } from "../../services/types";
 //
 //
 
 const actionDispatch = (dispatch: Dispatch) => ({
     setItems: (page: any) => dispatch(setItemData(page)),
 });
+const stateSelector = createSelector(fetchState, (state) => ({
+    state,
+}));
 
 export function HomePage() {
     const { setItems } = actionDispatch(useAppDispatch());
-
+    const { state } = useAppSelector(stateSelector);
+    const [items, setItem] = useState<Array<Item> | null>();
+    //
     const fetchItems = async () => {
-        const items = await ItemsService.getItems(1, 10).catch((err) => {
-            console.log("Error: ", err);
-        });
-        //
-        console.log("Anime page: ", items);
-        if (items) setItems(items);
+        await ItemsService.getItems(1, 10)
+            .then((res) => {
+                setItems(res);
+                let data = res as any;
+                setItem(data);
+            })
+            .catch((err) => {
+                console.log("Error: ", err);
+                toast.error("Error fetching data");
+            });
     };
 
     useEffect(() => {
         fetchItems();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [state]);
 
-    const [items, setItem] = useState<any>([
-        {
-            id: 1,
-            name: "Item 1",
-            description:
-                "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.",
-        },
-        {
-            id: 2,
-            name: "Item 2",
-            description:
-                "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.",
-        },
-        {
-            id: 3,
-            name: "Item 3",
-            description:
-                "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.",
-        },
-    ]);
-
-    function updateItems(id: any, name: any, description: any) {
-        const updatedItems = items.map((item: { id: any }) => {
-            if (id === item.id) {
-                return { ...item, description: description, name: name };
-            }
-            return item;
-        });
-        setItem(updatedItems);
+    async function updateItems(id: any, name: any, description: any) {
+        await ItemsService.updateItem({ name, description }, id)
+            .then((res: any) => {
+                const updatedItems = items?.map((item) => {
+                    if (id === item.uuid) {
+                        return {
+                            ...item,
+                            description: description,
+                            name: name,
+                        };
+                    }
+                    return item;
+                });
+                setItem(updatedItems);
+            })
+            .catch((err) => {
+                console.log("Error: ", err);
+            });
     }
 
-    const handleDeleteItem = (e: any) => {
-        setItem(items.filter((item: { id: any }) => item.id !== e));
+    const handleDeleteItem = async (e: any) => {
+        await ItemsService.deleteItem(e)
+            .then((res) => {
+                setItem(items?.filter((item) => item.uuid !== e));
+            })
+            .catch((err) => {
+                console.log("Error: ", err);
+            });
     };
 
-    function addItem(name: any, description: any) {
-        const item = {
-            id: "id",
-            name: name,
-            description: description,
-        };
-        setItem([...items, item]);
+    async function addItem(name: any, description: any) {
+        await ItemsService.createItem({ name, description })
+            .then((res: any) => {
+                if (items) {
+                    setItem([...items, res]);
+                } else {
+                    setItem([res]);
+                }
+            })
+            .catch((err) => {
+                console.log("Error: ", err);
+            });
+        //
+    }
+
+    async function verifyEmail(): Promise<void> {
+        await ItemsService.resendVerificationEmail()
+            .then((res: any) => {
+                toast.success("Verification email sent");
+            })
+            .catch((err) => {
+                console.log("Error: ", err);
+                toast.error("Error sending Verification email");
+            });
+        //
     }
 
     const logOut = () => {
         localStorage.clear();
+        window.location.reload();
     };
 
     //
     //
     return (
         <Wrapper>
-            <VerifyEmail />
+            <VerifyEmail verifyEmail={verifyEmail} />
             <header>
                 <h1>Dashboard</h1>
-
                 <PopupState variant="popover" popupId="demo-popup-menu">
                     {(popupState: any) => (
                         <React.Fragment>
@@ -101,7 +127,10 @@ export function HomePage() {
                                 sx={{ textTransform: "none" }}
                             >
                                 <div className="profile">
-                                    <h2>John Jones</h2>
+                                    <h2 style={{ textTransform: "capitalize" }}>
+                                        {state?.userData?.user?.first_name}{" "}
+                                        {state?.userData?.user?.last_name}
+                                    </h2>
                                     <AiFillCaretDown
                                         style={{ color: "#000" }}
                                     />
@@ -119,15 +148,11 @@ export function HomePage() {
             </header>
             <div className="container">
                 <div className="items">
-                    {items.map(
-                        (item: {
-                            id: React.Key | null | undefined;
-                            name: any;
-                            description: any;
-                        }) => {
+                    {items && items?.length > 0 ? (
+                        items?.map((item) => {
                             const editItem = (
                                 <EditItem
-                                    id={item.id}
+                                    id={item.uuid}
                                     name={item.name}
                                     description={item.description}
                                     updateItem={updateItems}
@@ -135,19 +160,22 @@ export function HomePage() {
                             );
                             return (
                                 <Items
-                                    key={item.id}
+                                    key={item.uuid}
                                     index={item.name}
                                     description={item.description}
                                     editItem={editItem}
                                     deleteItem={(e: any) =>
-                                        handleDeleteItem(item.id)
+                                        handleDeleteItem(item.uuid)
                                     }
                                 />
                             );
-                        }
+                        })
+                    ) : (
+                        <h1 style={{ textAlign: "right" }}>
+                            Items no available
+                        </h1>
                     )}
                 </div>
-
                 <DashboardModal addItem={addItem} />
             </div>
         </Wrapper>
@@ -156,10 +184,25 @@ export function HomePage() {
 
 const Wrapper = styled.div`
     /* height: 100vh; */
+    width: 100%;
+    box-sizing: border-box;
+    .items {
+        display: inline;
+        justify-content: space-between;
+        gap: 10px;
+        width: 95%;
+        margin: auto;
+        box-sizing: border-box;
+
+        div {
+            width: 90%;
+        }
+    }
     header {
         background-color: #fff;
         border: 1px solid #f0f0f0;
         display: flex;
+        align-items: center;
         justify-content: space-between;
         padding: 25px 55px 27px 58px;
         @media screen and (max-width: 770px) {

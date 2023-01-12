@@ -26,8 +26,6 @@ const Items = (props: any) => {
 export default Items;
 
 const Item = styled.div`
-    margin: 16px;
-    width: 420px;
     padding: 20px;
     background: #ffffff;
     border: 1px solid #f0f0f0;
@@ -35,15 +33,7 @@ const Item = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    @media screen and (max-width: 1024px) {
-        width: 320px;
-    }
-    @media screen and (max-width: 770px) {
-        width: 420px;
-    }
-    @media screen and (max-width: 640px) {
-        width: 330px;
-    }
+    width: 100%;
     .name {
         margin-bottom: 16px;
         p {

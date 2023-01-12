@@ -45,3 +45,8 @@ export interface IState {
     items: Partial<Item>;
     userData: Partial<User>;
 }
+
+export interface CreateItemParam {
+    name: string;
+    description: string;
+}

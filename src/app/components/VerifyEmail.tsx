@@ -1,12 +1,13 @@
 import { Link } from "@mui/material";
 import React from "react";
 import styled from "styled-components";
-const VerifyEmail = () => {
+const VerifyEmail = (props: { verifyEmail: () => Promise<void> }) => {
     return (
         <Wrapper>
             <p>
                 You have not verified your email address. Click{" "}
-                <Link> here </Link> to resend verification link.
+                <Link onClick={() => props.verifyEmail()}> here </Link> to
+                resend verification link.
             </p>
         </Wrapper>
     );

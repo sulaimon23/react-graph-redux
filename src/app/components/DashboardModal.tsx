@@ -92,6 +92,7 @@ export default function DashboardModal({ addItem }: any) {
                             <button
                                 className="create-event"
                                 form="dashboardmodal"
+                                disabled={!name || !description}
                             >
                                 Create Event
                             </button>
