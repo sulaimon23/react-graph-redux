@@ -33,7 +33,7 @@ function App() {
             navigate("/dashboard");
         } else if (
             (path.pathname.includes("/dashboard") ||
-                path.pathname.includes("/verify")) &&
+                path.pathname.includes("verify")) &&
             !state.userData.token
         ) {
             navigate("/login");
@@ -48,7 +48,7 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/dashboard" element={<HomePage />} />
                 <Route path="/signup" element={<SignUpPage />} />
-                <Route path="/verify" element={<Verified />} />
+                <Route path="/email/verify/:id" element={<Verified />} />
                 <Route path="*" element={<Navigate to="/login" />} />
             </Routes>
         </>
