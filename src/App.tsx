@@ -1,8 +1,8 @@
-import { HomePage } from "./app/pages/HomePage";
+import { HomePage } from "./app/pages/HomePage/Home";
 import { Routes, Route } from "react-router-dom";
-import { LoginPage } from "./app/pages/Login";
-import { SignUpPage } from "./app/pages/Signup";
-import { Verified } from "./app/pages/VerifiedPage";
+import { LoginPage } from "./app/pages/Login/Login";
+import { SignUpPage } from "./app/pages/Signup/Signup";
+import { Verified } from "./app/pages/VerifiedPage/Verify";
 import { Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
