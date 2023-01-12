@@ -1,5 +1,5 @@
 import { apolloClient } from "../../graphql";
-import { GET_ITEMS, ADD_ITEM, UPDATE_ITEM, DELETE_ITEM, SEND_MAIL } from "./queries";
+import { GET_ITEMS, ADD_ITEM, UPDATE_ITEM, DELETE_ITEM, SEND_MAIL, VERIFY } from "./queries";
 import { CreateItemParam, GetItemsResponse } from '../types';
 
 
@@ -72,6 +72,22 @@ class ItemsService {
             const response = await apolloClient.mutate({
                 mutation: SEND_MAIL,
                 variables: {},
+            });
+
+            if (!response || !response.data)
+                throw new Error("Cannot get items list!");
+
+        } catch (err) {
+            throw err;
+        }
+    }
+
+
+    async verifyMe(token: string): Promise<void> {
+        try {
+            const response = await apolloClient.mutate({
+                mutation: VERIFY,
+                variables: { token },
             });
 
             if (!response || !response.data)

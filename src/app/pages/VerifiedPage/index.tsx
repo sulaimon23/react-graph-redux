@@ -1,28 +1,56 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import VerifiedIcon from "../../../assets/verified.png";
 import rightArrow from "../../../assets/right-arrow.svg";
+import itemsService from "../../services/itemsService";
+import { toast } from "react-toastify";
+import { useParams } from "react-router-dom";
 
 //
 //
+
 export function Verified() {
+    let params = useParams();
+    const [show, setShow] = useState(false);
+    const verifyMe = async (token: string) => {
+        await itemsService
+            .verifyMe(token)
+            .then((res) => {
+                setShow(true);
+                toast.success("Email verified");
+            })
+            .catch((err) => {
+                console.log("Error: ", err);
+                toast.error("User with verification token doest not exist");
+            });
+    };
+
+    useEffect(() => {
+        if (params?.id) {
+            verifyMe(params.id);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     return (
         <Wrapper>
-            <div className="container">
-                <div className="verified__card">
-                    <img
-                        src={VerifiedIcon}
-                        alt="verified"
-                        className="verified__card-img"
-                    />
-                    <p>Your email address has been verified.</p>
-                    <Link to="/dashboard">
-                        Go to Dashboard{" "}
-                        <img src={rightArrow} alt="right arrow" />
-                    </Link>
+            {show && (
+                <div className="container">
+                    <div className="verified__card">
+                        <img
+                            src={VerifiedIcon}
+                            alt="verified"
+                            className="verified__card-img"
+                        />
+                        <p>Your email address has been verified.</p>
+                        <Link to="/dashboard">
+                            Go to Dashboard{" "}
+                            <img src={rightArrow} alt="right arrow" />
+                        </Link>
+                    </div>
                 </div>
-            </div>
+            )}
         </Wrapper>
     );
 }

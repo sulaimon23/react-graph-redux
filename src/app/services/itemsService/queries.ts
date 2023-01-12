@@ -36,6 +36,22 @@ export const DELETE_ITEM = gql`
   }
 `;
 
+export const VERIFY = gql`
+  mutation verifyMe($token: String!) {
+    verifyMe(token: $token){
+        _id
+        uuid
+        first_name
+        last_name
+        email
+        email_verified_at
+        email_verification_token
+        created_at
+        updated_at
+        }
+  }
+`;
+
 export const SEND_MAIL = gql`
   mutation resendVerificationEmail {
     resendVerificationEmail{

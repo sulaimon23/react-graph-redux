@@ -32,8 +32,7 @@ function App() {
         ) {
             navigate("/dashboard");
         } else if (
-            (path.pathname.includes("/dashboard") ||
-                path.pathname.includes("verify")) &&
+            path.pathname.includes("/dashboard") &&
             !state.userData.token
         ) {
             navigate("/login");

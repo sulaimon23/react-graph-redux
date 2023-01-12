@@ -116,7 +116,9 @@ export function HomePage() {
     //
     return (
         <Wrapper>
-            <VerifyEmail verifyEmail={verifyEmail} />
+            {!state?.userData?.user?.email_verified_at && (
+                <VerifyEmail verifyEmail={verifyEmail} />
+            )}
             <header>
                 <h1>Dashboard</h1>
                 <PopupState variant="popover" popupId="demo-popup-menu">
@@ -185,17 +187,23 @@ export function HomePage() {
 const Wrapper = styled.div`
     /* height: 100vh; */
     width: 100%;
+    overflow: hidden
+
     box-sizing: border-box;
     .items {
         display: inline;
         justify-content: space-between;
-        gap: 10px;
-        width: 95%;
+        gap: 20px;
+        width: 100%;
+        padding:10px;
         margin: auto;
         box-sizing: border-box;
+        > div {
+            width:93%;
 
-        div {
-            width: 90%;
+            @media screen and (max-width: 770px) {
+                width:87%;            
+            }
         }
     }
     header {
@@ -235,21 +243,28 @@ const Wrapper = styled.div`
     }
     .container {
         margin: 32px 58px;
-        max-width: 1480px;
+        max-width: 1440px;
         margin: 0 auto;
         position: relative;
         .items {
             margin-top: 32px;
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
+            overflow: hidden !important;
             justify-items: center;
             @media screen and (max-width: 1024px) {
                 grid-template-columns: 1fr 1fr;
             }
             @media screen and (max-width: 770px) {
                 grid-template-columns: 1fr;
+                justify-items: left;
                 margin-top: 24px;
             }
+        }
+
+        @media screen and (max-width: 770px) {
+            max-width:98% !important;
+            overflow: hidden !important;
         }
     }
     .add-icon {

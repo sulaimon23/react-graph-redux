@@ -33,7 +33,6 @@ const Item = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 100%;
     .name {
         margin-bottom: 16px;
         p {
@@ -43,6 +42,7 @@ const Item = styled.div`
             line-height: 15px;
             /* identical to box height */
             color: #555658;
+            word-break: break-all;
         }
         h2 {
             font-style: normal;
@@ -55,6 +55,7 @@ const Item = styled.div`
     }
     .description {
         margin-bottom: 24px;
+        overflow: hidden;
         h4 {
             font-style: normal;
             font-weight: 400;
@@ -70,12 +71,14 @@ const Item = styled.div`
             font-size: 14px;
             line-height: 17px;
             color: #131415;
+            width: 100%;
+            word-break: break-all;
         }
     }
     .buttons {
         display: flex;
         flex-direction: row;
-        justify-content: flex-end;
+        justify-content: space-between;
         margin-top: 24px;
         gap: 24px;
         button {
